@@ -56,6 +56,9 @@ $route['news'] = 'news';
 $route['shkaf/open_book/(:any)'] = 'shkaf/open_book/$1';
 $route['(:any)'] = 'pages/view/$1';
 
+$route['post_ajax/(:any)'] = 'Post_ajax/$1';
+$route['post_ajax'] = 'post_ajax/index';
+
 $route['default_controller'] = 'pages/view'; //was 'welcome'
 //$route['(:any)'] = 'pages/view/$1'; //was added
 $route['404_override'] = '';
