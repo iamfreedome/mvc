@@ -23,10 +23,16 @@
 </div>
 <!--POSTS HERE-->
  
- <?php $base = base_url().'index.php/board/answer/'; $base_del = base_url().'index.php/board/del_post/'; foreach ($resi as $row): if ($row->deleted != 1) {  //was { ?>
+ <?php $base = base_url().'index.php/board/answer/'; $base_del = base_url().'index.php/board/del_post/'; 
+ foreach ($resi as $row): if ($row->deleted != 1) {  //was { ?>
 
 <div class="col-lg-5 col-lg-offset-2" id="div<?php echo $row->post_id; ?>">
  Заголовок: <?php echo $row->title; ?> -> Тема: <?php echo $row->theme; ?> 
+ 
+ <?php if ( $row->comment_id > 0 ) { echo '<div class="alert-info" align="right">"   ',$row->comment,'"   </div>';
+  } 
+  ?>
+ 
  <p>
   
  <?php echo $row->text; ?> <!-- ответить ссылка-->
@@ -53,8 +59,8 @@
  //echo $title." " //print_r($resi)
  //?> -->
  <?php $_SESSION['board_id'] == -1 ? print ('<a class="-1" id="sense"></a>') : print('<a class="'.$_SESSION['board_id'].'" id="self"></a>')?>
- <div class="result" id="cartmessage" style="display: none">Дополнительные комментарии: <br></div>
- <a href="#" class="row-md-10" id="btn" > ЕЩЕ КОММЕНТАРИИ </a>
+ <div class="result" id="cartmessage" style="display: none">Дополнительные комментарии: <br></div><br>
+ <a href="#" class="row-md-10" id="btn" > ЕЩЕ КОММЕНТАРИИ (5 штук) </a>
  <script type="text/javascript" src="<?php echo base_url()?>assets/js/jquery-3.4.1.min.js"></script>
  
  <script> 
@@ -79,8 +85,9 @@
 				let msg = document.createElement('div'); //можно из JS лепить но я буду генерить готовый нтмл в пхп
 				msg.className = "col-lg-5 col-lg-offset-2";
 				msg.innerHTML = response;
-				msg.show;
+				
 				cartmessage.append(msg);
+				msg.show;
 				//.addClass( 'one-message' )
 					//.textContent = response[i].text;
 					//.innerHTML
@@ -89,15 +96,15 @@
 			//	}
 			
 			$( '#cartmessage' ).show();
-			console.log( response);
+			//console.log( response);
 			//console.log( ar );
 			
 			//$('#message').show();
             //$( "#message" ).html( response );
             //$( '#cartmessage' ).show();
             //$( '.result' ).html( response );
-        } ).fail( function () {
-			
+        } ).fail( function (response) {
+			console.log( response);
             alert( "Invalide!" );
         } );
     } );

@@ -52,8 +52,9 @@ class Auth_model extends CI_Model {
 		$this->db->where('deleted <', 1);
 		$this->db->limit($limit,$offset);
 		$this->db->order_by('post_id', 'ASC');
+		//added
 		$query = $this->db->get();
-		
+		//$query = $this->add_comment($query->result());
 		return $query;
 	}
 	
@@ -68,7 +69,10 @@ class Auth_model extends CI_Model {
 		$this->db->where('deleted <', 1);
 		$this->db->limit( $limit , $offset);
 		$this->db->order_by('post_id', 'ASC');
+		//$query = $this->db->get();
+		//added
 		$query = $this->db->get();
+		//$query = $this->add_comment($query->result());
 		
 		return $query;
 	}
@@ -89,8 +93,10 @@ class Auth_model extends CI_Model {
 		$this->db->limit($limit,$offset);
 		$this->db->order_by('post_id', 'ASC');
 		
+		$query = $this->db->get();
+		//$query = $this->add_comment($query->result());
 		
-		return $this->db->get();
+		return $query;//$this->db->get();
 	}
 	
 	public function add_post($data) {
@@ -104,10 +110,66 @@ class Auth_model extends CI_Model {
 		$this->db->from('posts');
 		$this->db->where(array('post_id' => $post_id));
 		
-		return $this->db->get();
+		$query = $this->db->get();
+		//$query = $this->add_comment($query->result());
+		
+		return $query;//$this->db->get();
 		
 	}
 	
+	
+	public function get_post_withusername($post_id) {
+		$this->db->select('*');
+		$this->db->from('`posts`,`users`');
+		$this->db->where("`posts`.`user_id`=`users`.`user_id` AND `posts`.`post_id`=$post_id");
+		
+		$query = $this->db->get();
+		//$query = $this->add_comment($query->result());
+		
+		
+		return $query; //$this->db->get();
+		
+	}
+	
+	public function get_all_comment() {
+		$this->db->select('*'); //'`text`,`post_id`,`deleted`'
+		$this->db->from('posts');
+		$ret = $this->db->get();
+			
+		return $ret;
+	}
+	
+	public function get_comment($comment_id) {
+		if ($comment_id > 0) {
+		$arcom = $this->get_all_comment();
+		$arcom = $arcom->result();
+		
+		foreach ($arcom as $arrow) {
+		if ($comment_id == $arrow->post_id) { 
+				if ($arrow->deleted > 0) { return ('Сообщение было удалено ранее');} else {
+			return ($arrow->text);
+		} }
+		
+		
+					
+	}	
+	
+	} else { return 'test';}
+	}
+	
+	public function add_comment(array $ar) {
+		//$com = $this->get_all_comment()->result();
+		
+		
+		foreach ($ar as $rowsa) {
+			
+			$rowsa->comment = $this->get_comment($rowsa->comment_id);
+		}
+	return (array) $ar;
+	}
+	
+	
+		
 	public function dell_post($post_id) {
 		//print_r ($this->db);
 		//print ($this->db->username);

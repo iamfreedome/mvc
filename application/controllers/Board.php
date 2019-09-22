@@ -5,13 +5,18 @@ class Board extends CI_Controller {
 			parent::__construct();
 			$this->load->model('Auth_model');
 	}
-		public function all_posts() {  //все комменты одного пользователя
+		public function all_posts() {  //все комменты одного пользователя ворк
 			if (isset($_SESSION['user_id'])) {
 			$data['title'] = 'Все комментарии: '.$_SESSION['username'];
 			
 			$res = $this->Auth_model->all_posts($_SESSION['user_id']);
 			$res = $res -> result();
 			//print_r($res);
+						
+			$res = $this->Auth_model->add_comment($res);
+			//print ('             ');
+			print_r($res);
+			
 			$data['resi'] = $res;
 			$_SESSION['board_id']= -1;
 			$this->load->view('templates/header_board',$data);
@@ -23,7 +28,7 @@ class Board extends CI_Controller {
 			}
 		}
 		
-		public function view($user_id,$user_name) { //посты на доске
+		public function view($user_id,$user_name) { //посты на доске 
 			//print ($user_name);
 			$data['title'] = 'Доска пользователя: '.$user_name;
 			
@@ -31,11 +36,13 @@ class Board extends CI_Controller {
 			
 			
 			$res = $this->Auth_model->get_board($user_id); 
-			$rest = $res->result();
-			//print_r ($rest);
+			$res = $res->result();
+			$res = $this->Auth_model->add_comment($res);
+			print_r ($res);
+			
 		
-			if (isset($rest)) {
-				$data['resi'] = $rest;
+			if (isset($res)) {
+				$data['resi'] = $res;
 			//print_r ($_SESSION);
 			$this->load->view('templates/header_board',$data);
 			$this->load->view('posts',$data);
@@ -58,8 +65,11 @@ class Board extends CI_Controller {
 			$_SESSION['board_id'] = $user_id;
 			
 			$res = $this->Auth_model->get_board($user_id); 
-			$rest = $res->result();
-			$data['resi'] = $rest;
+			$res = $res->result(); 
+			$res = $this->Auth_model->add_comment($res);
+			
+			
+			$data['resi'] = $res;
 			//print_r ($_SESSION);
 			$this->load->view('templates/header_board',$data);
 			$this->load->view('posts',$data);
@@ -113,40 +123,58 @@ class Board extends CI_Controller {
 							//	print_r($_POST);
 							$this->Auth_model->add_post($data);
 							//redirect("board/view_board","refresh");
-							
-					
 				
 				//print ('Форма корректна');
-				
-				
 				}
 				//форма заполнена не полностью ... ну форм валидатор справиться сам
-			
-			//
 			}
-
 			//до момента нажатия кнопки коммент
 			$data['title'] = 'Комментировать Доску  '.$_SESSION['username'];
 						
 			$this->load->view('templates/header_board',$data);
 			$this->load->view('comment',$data);
 			$this->load->view('templates/footer_board',$data);
-		
-		
 		}
 		
 public function answer($post_id) {
 	if (isset($_SESSION['user_id'])) { $user_id = $_SESSION['user_id']; $user_name= $_SESSION['username']; } 
 	else { redirect("board/view_board","refresh"); }
+	
 	$data['title'] = 'Ответить пользователю  '.$user_name;
+	$com_post = ($this->Auth_model->get_post_withusername($post_id));	
+	
+	$com_post = $com_post->row();
+	$data['text']= $com_post->text;
+	$data['board_id'] = $com_post->board_id;
+	$data['answer'] = $com_post->username;
+	
 	
 	//print ('Tracer tag answer'.$post_id);
-		
-	$com_post = $this->Auth_model->get_post($post_id);	
-	$com_post = $com_post->row();
-	
-	
-	$data['text']= $com_post->text;
+			if (isset($_POST['comment'])) { //Сделать обязательными все поля.
+				$this->form_validation->set_rules('title','Заголовок','required' );
+				$this->form_validation->set_rules('text','ТЕКСТ','required' );
+				$transfer = FALSE;
+				
+				if ($this->form_validation->run() == TRUE) {
+						//форма комментария корректна. известить. комментарий в базу
+							$transfer = TRUE;
+							$data_insert = array (
+								'board_id' => $data['board_id'],
+								'user_id' => $_SESSION['user_id'],
+								'comment_id' => $post_id,
+								'title' => $_POST['title'],
+								'theme' => 'Answer '.$post_id.' '.$com_post->title.' to '.$data['answer'],
+								'text' => $_POST['text'],
+								'deleted' => -1);
+							//	print_r($_POST);
+							$this->Auth_model->add_post($data_insert);
+							
+							redirect("board/view_board","refresh");
+				
+				//print ('Форма корректна');
+				}
+				//форма заполнена не полностью ... ну форм валидатор справиться сам
+			}
 	
 	$this->load->view('templates/header_board',$data);
 			$this->load->view('answer',$data);
@@ -176,6 +204,13 @@ public function post_other() { //return JSON
 	$res = $this->Auth_model->get_board_other($id_board, $limit,  $_SESSION['offset']);
 	$res = $res->result();
 	
+	$res =  $this->Auth_model->add_comment($res);
+	foreach ($res as $row):
+	$row = (array) $row;
+	endforeach;
+	//$res = $res->result;
+	//print_r($res);		
+	
 	header('Content-type: application/json; charset=utf-8');
 	$json = json_encode($res, JSON_UNESCAPED_UNICODE);
 	//коверкать илди нет кирилицу $json = json_encode($res);
@@ -195,9 +230,18 @@ public function post_other_html() { //html
 	$res = $this->Auth_model->get_board_other($id_board, $limit,  $_SESSION['offset']);
 	$res = $res->result();
 	
+	$res =  $this->Auth_model->add_comment($res);
+	foreach ($res as $row):
+	$row = (array) $row;
+	endforeach;
+	
+	
+	
+	//$res = $this->Auth_model->add_comment($res);
+			
 				$data['title'] = 'Дополнительные комментарии ';
 				$data['resi'] = $res;
-
+    //print_r ($data);
 	$this->load->view('post_other',$data);
 
 
@@ -235,11 +279,11 @@ public function post_other_html() { //html
 
 -
 5) Добавить возможность отвечать на написанные комментарии (для таких комментариев перед текстом выводить блок с цитатой сообщения на которое написан ответ).
--
++
 вывести кнопку ответить – по нажатию будет  отображаться автор  на чьё сообщение хотите ответить и ниже форма с полями 
 Заголовок  сообщения, само сообщение . 
 
--
++
 В случае если родительский комментарий удален вместо сообщения выводить: “комментарий удален”.
 
 +
