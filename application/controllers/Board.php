@@ -15,7 +15,7 @@ class Board extends CI_Controller {
 						
 			$res = $this->Auth_model->add_comment($res);
 			//print ('             ');
-			print_r($res);
+			//print_r($res);
 			
 			$data['resi'] = $res;
 			$_SESSION['board_id']= -1;
@@ -38,7 +38,7 @@ class Board extends CI_Controller {
 			$res = $this->Auth_model->get_board($user_id); 
 			$res = $res->result();
 			$res = $this->Auth_model->add_comment($res);
-			print_r ($res);
+			//print_r ($res);
 			
 		
 			if (isset($res)) {
@@ -277,7 +277,7 @@ public function post_other_html() { //html
 4) Ограничить количество комментариев на странице 5. Остальные комментарии подгружать методом ajax.  
 По умолчанию будут выводиться 5 комментариев. Если записей больше указывать  стрелку вниз, по клику на неё будут выводиться  все комментарии оставленные на стене. 
 
--
++
 5) Добавить возможность отвечать на написанные комментарии (для таких комментариев перед текстом выводить блок с цитатой сообщения на которое написан ответ).
 +
 вывести кнопку ответить – по нажатию будет  отображаться автор  на чьё сообщение хотите ответить и ниже форма с полями 

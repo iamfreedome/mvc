@@ -58,7 +58,14 @@ class Auth_model extends CI_Model {
 		return $query;
 	}
 	
-	public function get_board_other($board_id,$limit,$offset) {
+	public function get_board_other($board_id,$limit,$offset) { 
+	
+	/*SELECT
+		c.text `text`,
+		IFNULL( p.text, '' ) `parent_text`
+			FROM posts c
+				LEFT JOIN posts p ON p.post_id = c.comment_id
+				WHERE c.post_id = 16;*/
 		//$limit = 5;
 		//$offset = 0;
 		

@@ -26,16 +26,16 @@
  <?php $base = base_url().'index.php/board/answer/'; $base_del = base_url().'index.php/board/del_post/'; 
  foreach ($resi as $row): if ($row->deleted != 1) {  //was { ?>
 
-<div class="col-lg-5 col-lg-offset-2" id="div<?php echo $row->post_id; ?>">
+<div class="col-lg-5 col-lg-offset-2" id="div<?php echo $row->post_id; ?>"> 
  Заголовок: <?php echo $row->title; ?> -> Тема: <?php echo $row->theme; ?> 
  
  <?php if ( $row->comment_id > 0 ) { echo '<div class="alert-info" align="right">"   ',$row->comment,'"   </div>';
   } 
   ?>
  
- <p>
+ <p><strong>
   
- <?php echo $row->text; ?> <!-- ответить ссылка-->
+ <?php echo $row->text; ?> </strong> <!-- ответить ссылка-->
  <br>
  <a href="<?php echo $base.$row->post_id ?>">
   <?php echo (isset($_SESSION['user_id']) ? ' Ответить ' : '') ?>
@@ -60,7 +60,7 @@
  //?> -->
  <?php $_SESSION['board_id'] == -1 ? print ('<a class="-1" id="sense"></a>') : print('<a class="'.$_SESSION['board_id'].'" id="self"></a>')?>
  <div class="result" id="cartmessage" style="display: none">Дополнительные комментарии: <br></div><br>
- <a href="#" class="row-md-10" id="btn" > ЕЩЕ КОММЕНТАРИИ (5 штук) </a>
+ <a href="#" class="row-md-10" id="btn" >ПОСМОТРЕТЬ ЕЩЕ КОММЕНТАРИИ </a>
  <script type="text/javascript" src="<?php echo base_url()?>assets/js/jquery-3.4.1.min.js"></script>
  
  <script> 
@@ -96,7 +96,7 @@
 			//	}
 			
 			$( '#cartmessage' ).show();
-			//console.log( response);
+			console.log( response);
 			//console.log( ar );
 			
 			//$('#message').show();

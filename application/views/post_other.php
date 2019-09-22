@@ -11,8 +11,8 @@
   ?>
  
  <p>
-  
- <?php echo $row->text; ?> <!-- ответить ссылка-->
+  <strong>
+ <?php echo $row->text; ?> </strong><!-- ответить ссылка-->
  <br>
  <a href="<?php echo $base.$row->post_id ?>">
   <?php echo (isset($_SESSION['user_id']) ? ' Ответить ' : '') ?>
