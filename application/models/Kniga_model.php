@@ -14,27 +14,13 @@ class kniga_model extends CI_Model {
 	
 	public function list_book() { //можно получать имя шкафа $patt
 		//получаем список книг в шкафу
-		//$patt = $patt + '/*.txt';
-	
-		//$book_return ['listbook'] = glob('shkaf/*');//array_merge(glob(),glob('shkaf/*'));//нет условия на названия файлов - это и может быть название книги
-		
-		//foreach ($book_return['listbook'] as $path) {
-		
-		foreach (glob('shkaf/*') as $path) {
-		
-			/*$pi = pathinfo($path); 
-			/*$book_return_iter['path'] = $path;
-			$book_return_iter['shkaf_name'] = $pi['dirname'];;
-			$book_return_iter['book_name'] = $pi['basename'];
-		*/
-		
-		$book_return['listbook'][] = $this->get_book_name($path);
+			
+			foreach (glob('shkaf/*') as $path) {
+				$book_return['listbook'][] = $this->get_book_name($path);
 		
 		// или можно ввести синтаксис что автор после последней точки будет без аббревиатур
 		// но автора нет в ТЗ так что пофиг
-		//ТОгда book_name = filename, autor = extension
 		}		
-		
 		return $book_return;
 		
 	}
@@ -42,10 +28,7 @@ class kniga_model extends CI_Model {
 		//положить книгу в шкаф - путь до книги или текст в текстовом поле ->  два варианта
 		$this->load->helper('url');
 		$book_name = url_title($this->input->post('title'),'dash',TRUE);
-		
-		
-		//$book_name = $this->input->post('title');
-		//$book_name = iconv("Windows-1251","UTF-8",$book_name);
+				
 		$book_name = urlencode($book_name);
 		
 		$path = $shkaf_name.'/'.$book_name;
@@ -68,10 +51,8 @@ class kniga_model extends CI_Model {
 	
 	public function open_book($path) {
 		//достать и прочитаь книгу из шкафа -> по названию книги видимо открывается файл и заполняется поле текстовое 
-		 //$path = urlencode($path);
-		 //$path = urldecode($path);
-		if (file_exists(urldecode($path))) {
-			$path = urldecode($path);
+			if (file_exists(urldecode($path))) {
+				$path = urldecode($path);
 		return file_get_contents($path); } else
 		{ return file_get_contents($path);
 		}

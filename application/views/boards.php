@@ -15,27 +15,19 @@
 		
 	<?php 
 	} else {?> 
-	<p> <a href="<?php echo base_url(); ?>index.php/auth/login">Авторизуйтесь </a> или <a href="<?php echo base_url(); ?>index.php/auth/register">зарегистрируйтесь </a>, чтобы оставлять комментарии.
-	</p>
+		<p> <a href="<?php echo base_url(); ?>index.php/auth/login">Авторизуйтесь </a> или <a href="<?php echo base_url(); ?>index.php/auth/register">зарегистрируйтесь </a>, чтобы оставлять комментарии.
+		</p>
 	<?php }  ?>
-	
-	
-
 	<br /> 
 	
 </div>
 
 <?php foreach ($resi as $row):  $base = base_url().'index.php/board/view/'?>
- <p>
- Доска пользователя: <a href="<?php echo $base.$row->user_id.'/'.$row->username; ?>">
- <?php echo $row->username; ?></a> <?php //print_r ($row);?>
- <?php //print ($row->username);?>
+	<p>
+		Доска пользователя: <a href="<?php echo $base.$row->user_id.'/'.$row->username; ?>">
+		<?php echo $row->username; ?></a> 
  
- </p>
+ 
+	</p>
  
  <?php endforeach; ?>
-
- 
- <!--//print_r ($resi);
- //echo $title." " //print_r($resi)
- //?> -->

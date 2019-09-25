@@ -19,17 +19,17 @@
   </head>
   <body>
     
-<div class="col-lg-5 col-lg-offset-2">
+	<div class="col-lg-5 col-lg-offset-2">
 
-	<h1>Страница пользователя</h1>
-	<p>Заполните поля для авторизации на нашем сайте
-	</p>
-	<?php if(isset($_SESSION['success'])) { ?>
+		<h1>Страница пользователя</h1>
+		<p>Заполните поля для авторизации на нашем сайте
+		</p>
+		<?php if(isset($_SESSION['success'])) { ?>
 		<div class="alert alert-success"> <?php echo $_SESSION['success']; ?></div>
-	<?php 
-	} ?>
+			<?php 
+			} ?>
 	
-	HELLO, <?php echo $_SESSION['username'] ?>
+		Здравствуйте, <?php echo $_SESSION['username'] ?>
 
 	<br /> <br />
 	

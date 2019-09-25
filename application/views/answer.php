@@ -19,12 +19,7 @@
 		<label for="title" > Заголовок </label>
 		<input class="form-control" name="title" id="title" type="text">
 	</div>
-<!--	
-	<div class="form-group">
-		<label for="theme" > Тема</label>
-		<input class="form-control" name="theme" id="theme" type="text" >
-	</div>
--->
+
 	<div class="form-group">
 		<label for="text" > Текст комментария</label>
 		<input class="form-control" name="text" id="text" type="text">
