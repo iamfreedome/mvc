@@ -1,4 +1,6 @@
-
+<?php
+$this->load->view('templates/header_shkaf',array('title' =>'Добавить книгу в шкаф!'));
+?>
 
 <?php echo validation_errors(); ?>
 
@@ -12,3 +14,6 @@
 	<input type="submit" name="submit" value="Дописать книгу" />
 	
 </form>
+<?php
+$this->load->view('templates/footer_shkaf');
+?>

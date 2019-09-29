@@ -2,9 +2,9 @@
 
 <a href='/index.php/shkaf/index'> Посмотреть шкаф </a> ||
 		<a href="/index.php/shkaf/book_add"> Положить книгу в шкаф </a> || </p>
-<a href='/index.php/board/main'> Доска </a>
+<a href='/index.php/board/view_board'> Доска </a>
 <em>&copy; 2019</em>
-<p>
+<p style="font-size: 6px">
 <?php 
 print_r($_SERVER);
 

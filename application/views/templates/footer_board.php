@@ -1,6 +1,6 @@
 <br /> <p>
 
-<a href='/index.php/board/main'> Доска </a> ||
+<a href='/index.php/board/view_board'> Доска </a> ||
 		<a href="/index.php/shkaf/index"> Шкаф </a> </p>
 
 <em>&copy; 2019</em>

@@ -1,224 +1,271 @@
 <?php
 
-class Board extends CI_Controller {
-		public function __construct() {
-			parent::__construct();
-			$this->load->model('Auth_model');
+class Board extends CI_Controller 
+{
+	public function __construct() 
+	{
+		parent::__construct();
+		$this->load->model('AuthModel');
+		$this->load->model('PostModel');
+		$this->load->model('CommentModel');
+		$this->load->library('session');
 	}
-		public function all_posts() {  //все комменты одного пользователя ворк
-			if (isset($_SESSION['user_id'])) {
-				$data['title'] = 'Все комментарии: '.$_SESSION['username'];
-			
-				$res = $this->Auth_model->all_posts($_SESSION['user_id']);
-				$res = $res -> result();
-						
-				$res = $this->Auth_model->add_comment($res);
-			
-				$data['resi'] = $res;
-				$_SESSION['board_id']= -1;
-				$this->load->view('templates/header_board',$data);
-				$this->load->view('posts',$data);
-				$this->load->view('templates/footer_board');
-		
-			} else {
-				redirect("auth/login","refresh");
-			}
-		}
-		
-		public function view($user_id,$user_name) { //посты на доске 
-			$data['title'] = 'Доска пользователя: '.$user_name;
-			
-			$_SESSION['board_id'] = $user_id;
-						
-			$res = $this->Auth_model->get_board($user_id); 
-			$res = $res->result();
-			$res = $this->Auth_model->add_comment($res);
-			
-			if (isset($res)) {
-				$data['resi'] = $res;
-				$this->load->view('templates/header_board',$data);
-				$this->load->view('posts',$data);
-				$this->load->view('templates/footer_board');
-			} else {
-			
-			$this->load->view('templates/header_board',$data);
-			$this->load->view('empty');
-			$this->load->view('templates/footer_board');
-		}
-	}
-		
-		public function my_board() {
-			
-			if (isset($_SESSION['user_id'])) {
-				$user_id = $_SESSION['user_id'];
-				$user_name = $_SESSION['username'];
-				$data['title'] = 'Доска пользователя: '.$user_name;
-			
-				$_SESSION['board_id'] = $user_id;
-			
-				$res = $this->Auth_model->get_board($user_id); 
-				$res = $res->result(); 
-				$res = $this->Auth_model->add_comment($res);
-			
-			
-				$data['resi'] = $res;
-			
-				$this->load->view('templates/header_board',$data);
-				$this->load->view('posts',$data);
-				$this->load->view('templates/footer_board');
-			} else { $this->load->view('templates/header_board',array ('title' => 'МОЯ СТРАНИЦА'));
 	
-			$this->load->view('templates/footer_board');
+	public function auth_inf()
+	{
+		$ai = array ( 'user_logged' => ($this->session->has_userdata('user_logged') ? TRUE : FALSE ),
+			'username' => ($this->session->has_userdata('user_logged') ? $this->session->username : ''),
+			'user_id' => ($this->session->has_userdata('user_logged') ? $this->session->user_id : FALSE),
+			'board_id' => $this->session->userdata('board_id'),
+		);
+		return $ai;
+	}
+	
+	public function path_inf()
+	{
+		$pi = array ('base' => base_url().'index.php/board/answer/', 
+			'base_del' => base_url().'index.php/board/delete_post/');
+			return $pi;
+	}
+	
+	public function prepare_data($data)
+	{
+		$data['ai']= $this->auth_inf();
+		$data['pi']= $this->path_inf();
+		
+		return $data;
+	}
+	
+	public function all_posts() 
+	{  //все комменты одного пользователя ворк set_userdata ('some_name',  'some_value')
+		if ($this->session->has_userdata('user_id')) 
+		{
+			$res = $this->PostModel->all_posts($this->session->user_id);
+			$res = $res -> result();
+			$res = $this->CommentModel->add_comment($res);
 			
+			$data['resi'] = $res;
+			$this->session->set_userdata('board_id', -1);
+			$data['uname'] = $this->session->username;
+			$data = $this->prepare_data($data);
+			
+			$this->load->view('board/posts_all',$data);
+				
+		} else 
+		{
+				redirect("auth/login","refresh");
 		}
 	}
 		
-		public function view_board() { //доски всеъх пользователей
-			
-			$res = $this->Auth_model->get_all_boards();
-			$data['resi'] = $res->result(); //was res-> row()
-			$data['title'] = 'Доски пользователей';
-			
-			$this->load->view('templates/header_board',$data);
-			$this->load->view('boards',$data);
-			$this->load->view('templates/footer_board',$data);
-		}
+	public function view($user_id,$user_name) 
+	{ //посты на доске 
+		$this->session->set_userdata('board_id', $user_id);
+		$data['uname'] = $user_name;
+		$data = $this->prepare_data($data);
+					
 		
-		public function main() {
+		$res = $this->PostModel->get_board($user_id); 
+		$res = $res->result();
+		$res = $this->CommentModel->add_comment($res);
+			
+		if (isset($res)) 
+		{
+			$data['resi'] = $res;
+			$this->load->view('board/posts',$data);
+		} 
+		else 
+		{
+			$this->load->view('board/empty');
+		}
+	}
+		
+	public function my_board() 
+	{	
+		if ($this->session->has_userdata('user_id')) 
+		{
+			$user_id = $this->session->user_id;
+			$user_name = $this->session->username;
+			
+		
+			$this->session->set_userdata('board_id', $user_id);
+		
+			$res = $this->PostModel->get_board($user_id); 
+			$res = $res->result(); 
+			$res = $this->CommentModel->add_comment($res);
+			
+			$data['resi'] = $res;
+			$data['uname'] = $user_name;
+			$data = $this->prepare_data($data);
+			
+			$this->load->view('board/posts',$data);
+			
+		} else 
+		{ 
 			redirect("board/view_board","refresh");
 		}
+	}
 		
-		public function comment($post_id) { //добавить пост на страницу
+	public function view_board()
+	{ //доски всеъх пользователей
+		$this->session->set_userdata('board_id', -1);	
+		$res = $this->PostModel->get_all_boards();
+		$data['resi'] = $res->result(); 
+		$data = $this->prepare_data($data);
+		$this->load->view('board/boards',$data);
+		
+	}
+		
+		/*public function main() {
+			redirect("board/view_board","refresh");
+		}*/
+		
+	public function comment($post_id) 
+	{ //добавить пост на страницу
+		if (isset($_POST['comment'])) 
+		{ //Сделать обязательными все поля.
+			$this->form_validation->set_rules('title','Заголовок','required' );
+			$this->form_validation->set_rules('theme','Email','required' );
+			$this->form_validation->set_rules('text','ТЕКСТ','required' );
+			$transfer = FALSE;
 				
-			if (isset($_POST['comment'])) { //Сделать обязательными все поля.
-				$this->form_validation->set_rules('title','Заголовок','required' );
-				$this->form_validation->set_rules('theme','Email','required' );
-				$this->form_validation->set_rules('text','ТЕКСТ','required' );
-				$transfer = FALSE;
-				
-				if ($this->form_validation->run() == TRUE) {
-						//форма комментария корректна. известить комментарий в базу
-							$transfer = TRUE;
-							$data = array (
-								'board_id' => $_SESSION['board_id'],
-								'user_id' => $_SESSION['user_id'],
-								'comment_id' => $post_id,
-								'title' => $_POST['title'],
-								'theme' => $_POST['theme'],
-								'text' => $_POST['text'],
-								'deleted' => -1);
+			if ($this->form_validation->run() == TRUE) 
+			{
+			//форма комментария корректна. известить комментарий в базу
+				$transfer = TRUE;
+				$data = array (
+					'board_id' => $this->session->board_id,
+					'user_id' => $this->session->user_id,
+					'comment_id' => $post_id,
+					'title' => $_POST['title'],
+					'theme' => $_POST['theme'],
+					'text' => $_POST['text'],
+					'deleted' => -1,
+					);
 							
-							$this->Auth_model->add_post($data);
-							
-				
-				
-				}
-				//форма заполнена не полностью ... ну форм валидатор справиться сам
+				$this->PostModel->add_post($data);
 			}
-			//до момента нажатия кнопки коммент
-			$data['title'] = 'Комментировать Доску  '.$_SESSION['username'];
-						
-			$this->load->view('templates/header_board',$data);
-			$this->load->view('comment',$data);
-			$this->load->view('templates/footer_board',$data);
+				//форма заполнена не полностью ... ну форм валидатор справиться сам
 		}
+		//до момента нажатия кнопки коммент
+		$this->load->view('board/comment',array('title' => $this->session->username));
+	}
 		
-		public function answer($post_id) {
-			if (isset($_SESSION['user_id'])) 
-				{ $user_id = $_SESSION['user_id']; $user_name= $_SESSION['username']; } 
-			else { redirect("board/view_board","refresh"); }
+	public function answer($post_id) 
+	{
+		if ($this->session->has_userdata('user_id')) 
+		{ 
+			$user_id = $this->session->user_id; $user_name= $this->session->username; 
+		} 
+		else 
+		{ 
+			redirect("board/view_board","refresh"); 
+		}
+		$com_post = ($this->PostModel->get_post_withusername($post_id));	
+		$com_post = $com_post->row();
+		$data['text']= $com_post->text;
+		$data['board_id'] = $com_post->board_id;
+		$data['answer'] = $com_post->username;
 	
-			$data['title'] = 'Ответить пользователю  '.$user_name;
-			$com_post = ($this->Auth_model->get_post_withusername($post_id));	
-			$com_post = $com_post->row();
-	
-			$data['text']= $com_post->text;
-			$data['board_id'] = $com_post->board_id;
-			$data['answer'] = $com_post->username;
-	
-			if (isset($_POST['comment'])) { //Сделать обязательными все поля.
-				$this->form_validation->set_rules('title','Заголовок','required' );
-				$this->form_validation->set_rules('text','ТЕКСТ','required' );
-				$transfer = FALSE;
+		if (isset($_POST['comment'])) 
+		{ //Сделать обязательными все поля.
+			$this->form_validation->set_rules('title','Заголовок','required' );
+			$this->form_validation->set_rules('text','ТЕКСТ','required' );
+			$transfer = FALSE;
 				
-				if ($this->form_validation->run() == TRUE) {
-						//форма комментария корректна. известить. комментарий в базу
-							$transfer = TRUE;
-							$data_insert = array (
-								'board_id' => $data['board_id'],
-								'user_id' => $_SESSION['user_id'],
-								'comment_id' => $post_id,
-								'title' => $_POST['title'],
-								'theme' => 'Answer '.$post_id.' '.$com_post->title.' to '.$data['answer'],
-								'text' => $_POST['text'],
-								'deleted' => -1);
-							//	print_r($_POST);
-							$this->Auth_model->add_post($data_insert);
-							
-							redirect("board/view_board","refresh");
+			if ($this->form_validation->run() == TRUE) 
+			{
+			//форма комментария корректна. известить. комментарий в базу
+				$transfer = TRUE;
+				$data_insert = array (
+					'board_id' => $data['board_id'],
+					'user_id' => $this->session->user_id,
+					'comment_id' => $post_id,
+					'title' => $_POST['title'],
+					'theme' => 'Answer '.$post_id.' '.$com_post->title.' to '.$data['answer'],
+					'text' => $_POST['text'],
+					'deleted' => -1,
+				);
 				
-				//print ('Форма корректна');
-				}
+				$this->CommentModel->set_comment($data_insert);
+				redirect("board/view_board","refresh");
+			}
 				//форма заполнена не полностью ... ну форм валидатор справиться сам
-			}
-	
-			$this->load->view('templates/header_board',$data);
-			$this->load->view('answer',$data);
-			$this->load->view('templates/footer_board',$data);
+		}
+		$this->load->view('board/answer',$data);
 	}
 	
-		public function del_post($post_id) {
-	//проверка нужна или нет. по умолчанию проверять не будем. пусть даже удалят
-			if (isset($_SESSION['user_id'])) {
-			$this->Auth_model->dell_post($post_id);
-			$this->view($_SESSION['user_id'],$_SESSION['username']);
-			}
+	public function delete_post($post_id) 
+	{  	//проверка нужна или нет. по умолчанию проверять не будем. пусть даже удалят
+		if ($this->session->has_userdata('user_id')) 
+		{
+			$this->PostModel->delete_post($post_id);
+			$this->view($this->session->user_id,$this->session->username);
+		}
 	
 	}
 
-		public function post_other() { //return JSON
+	public function post_other() 
+	{ //return JSON
+		$this->session->set_userdata('offset', ($this->session->has_userdata('offset') ? $this->session->offset + (isset($_POST['limit']) ? $_POST['limit'] : 0 ) : 5 ));
 	
-			$_SESSION['offset'] = (isset($_SESSION['offset']) ? $_SESSION['offset'] + (isset($_POST['limit']) ? $_POST['limit'] : 0 ) : 5 );
+		$limit = (isset($_POST['limit']) ? $_POST['limit'] : 0 );
+		$id_board = (isset($_POST['board_id']) ? $_POST['board_id'] : 1);
 	
-			$limit = (isset($_POST['limit']) ? $_POST['limit'] : 0 );
-			$id_board = (isset($_POST['board_id']) ? $_POST['board_id'] : 1);
+		$res = $this->PostModel->get_board_other($id_board, $limit, $this->session->offset);
+		$res = $res->result();
+		$res =  $this->CommentModel->add_comment($res);
 	
-			$res = $this->Auth_model->get_board_other($id_board, $limit,  $_SESSION['offset']);
-			$res = $res->result();
-	
-			$res =  $this->Auth_model->add_comment($res);
-			foreach ($res as $row):
-				$row = (array) $row;
-			endforeach;
+		foreach ($res as $row):
+			$row = (array) $row;
+		endforeach;
 		
-			header('Content-type: application/json; charset=utf-8');
-			$json = json_encode($res, JSON_UNESCAPED_UNICODE);
-	//коверкать илди нет кирилицу $json = json_encode($res);
+		header('Content-type: application/json; charset=utf-8');
+		$json = json_encode($res, JSON_UNESCAPED_UNICODE);
+		//коверкать илди нет кирилицу $json = json_encode($res);
 	
-			echo ($json);
+		echo ($json);
 	}
 
-		public function post_other_html() { //html
+	public function post_other_html() 
+	{ //html
 	
-			$_SESSION['offset'] = (isset($_SESSION['offset']) ? $_SESSION['offset'] + (isset($_POST['limit']) ? $_POST['limit'] : 0 ) : 5 );
-			$limit = (isset($_POST['limit']) ? $_POST['limit'] : 0 );
-			$id_board = (isset($_SESSION['board_id']) ? $_SESSION['board_id'] : $_POST['board_id']);
+		$this->session->set_userdata('offset', ($this->session->has_userdata('offset') ? $this->session->offset + (isset($_POST['limit']) ? $_POST['limit'] : 0 ) : 5 ));
+		$limit = (isset($_POST['limit']) ? $_POST['limit'] : 0 );
+		$id_board = ($this->session->has_userdata('board_id') ? $this->session->board_id : $_POST['board_id']);
 		
-			$res = $this->Auth_model->get_board_other($id_board, $limit,  $_SESSION['offset']);
-			$res = $res->result();
+		$res = $this->PostModel->get_board_other($id_board, $limit,  $this->session->offset);
+		$res = $res->result();
+		$res =  $this->CommentModel->add_comment($res);
 	
-			$res =  $this->Auth_model->add_comment($res);
-			foreach ($res as $row):
-				$row = (array) $row;
-			endforeach;
-	
-			$data['title'] = 'Дополнительные комментарии ';
-			$data['resi'] = $res;
-			$this->load->view('post_other',$data);
+		foreach ($res as $row):
+			$row = (array) $row;
+		endforeach;
+		$data['resi'] = $res;
+		$data = $this->prepare_data($data);
+				
+		$this->load->view('board/post_other',$data);
 	}
 	
 }
 /*MVC
+	1)+ Использовать встренный механизм сессий, а не $_SESSION
+2)+ Форматирование не соотвествует стандартам движка, например https://prnt.sc/pbngzu
+	3)+ Не использовать шаблонизацию внутри контроллеров, для этого есть вьюхи https://prnt.sc/pbnh5x
+	4)+ Использовать для проверки доступа к приватной зоне либо стандартные средства, либо общий контроллер от которого идет наследование для всех других https://prnt.sc/pbnhgz
+	5)+ Непонятен смысл таких конструкций https://prnt.sc/pbnj6t
+	6)+ Опять форматирование https://prnt.sc/pbnjjl
+	7)+ Есть струткруные проблемы с построением моделей, модель поста одна, модель комментария другая, пост != коммент, соотвественно нужно это поправить, сейчас вообще моделей нет?
+	8 )+ https://prnt.sc/pbnko2 англ язык тут поправить либо del либо delete
+	9) + Проверить на уязвимость стороннего открытия файлов системы, те можно ли открыть файл на диске С подделав запрос
+https://prnt.sc/pbnlce
+	10)+ https://prnt.sc/pbnlw0 в модель авторизации нельзя писать действия которые нужны для модели постов и комментов, это разные сущности
+11)+ Для форматирования можно юзать вот этот гайд https://framework.zend.com/manual/2.4/en/ref/coding.standard.html
+	12)+ https://prnt.sc/pbnmh6 лишние файлы
+	13)+ не использовать сессии во вью, они принмают данные тока от контроллеров
+	14)+ нельзя дублировать код во вью, использовать струткуру где постоянные элементы вставляются автоматически, типа шапки
+
+
+
 На его основе создать сайт со следующим функционалом:
 
 

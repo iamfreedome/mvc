@@ -1,6 +1,8 @@
-<?php //view/shkaf/listBook.php 
-//<h2> СОДЕРЖИМОЕ ШКАФА </h2>
 
+
+<?php //view/shkaf/listBook.php
+//<h2> СОДЕРЖИМОЕ ШКАФА </h2>
+$this->load->view('templates/header_shkaf',array ('title' => 'СОДЕРЖАНИЕ ШКАФА'));
 ?>
 <?php foreach ($listbook as $nameBook): ?>
 <h3><?php echo $nameBook['book_name']// 
@@ -13,4 +15,6 @@
 		<p> 
 		
 
-<?php endforeach ?>
+<?php endforeach; 
+$this->load->view('templates/footer_shkaf');
+?>
