@@ -20,14 +20,12 @@
 
         $.post( url, data ).done( function ( response ) {
 				
-				//а мы на вход возьмем готовый html
+			let msg = document.createElement('div'); 
+			msg.className = "col-lg-5 col-lg-offset-2";
+			msg.innerHTML = response;
 				
-				let msg = document.createElement('div'); //можно из JS лепить но я буду генерить готовый нтмл в пхп
-				msg.className = "col-lg-5 col-lg-offset-2";
-				msg.innerHTML = response;
-				
-				cartmessage.append(msg);
-				msg.show;
+			cartmessage.append(msg);
+			msg.show;
 				
 			$( '#cartmessage' ).show();
 			console.log( response);
@@ -35,7 +33,7 @@
         } ).fail( function (response) {
 			console.log( response);
             alert( "Invalide!" );
-        } );
+		} );
     } );
 } );
 </script>

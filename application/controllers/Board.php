@@ -9,35 +9,11 @@ class Board extends CI_Controller
 		$this->load->model('PostModel');
 		$this->load->model('CommentModel');
 		$this->load->library('session');
-	}
-	
-	public function auth_inf()
-	{
-		$ai = array ( 'user_logged' => ($this->session->has_userdata('user_logged') ? TRUE : FALSE ),
-			'username' => ($this->session->has_userdata('user_logged') ? $this->session->username : ''),
-			'user_id' => ($this->session->has_userdata('user_logged') ? $this->session->user_id : FALSE),
-			'board_id' => $this->session->userdata('board_id'),
-		);
-		return $ai;
-	}
-	
-	public function path_inf()
-	{
-		$pi = array ('base' => base_url().'index.php/board/answer/', 
-			'base_del' => base_url().'index.php/board/delete_post/');
-			return $pi;
-	}
-	
-	public function prepare_data($data)
-	{
-		$data['ai']= $this->auth_inf();
-		$data['pi']= $this->path_inf();
-		
-		return $data;
+		$this->load->model('BoardModel');
 	}
 	
 	public function all_posts() 
-	{  //все комменты одного пользователя ворк set_userdata ('some_name',  'some_value')
+	{  
 		if ($this->session->has_userdata('user_id')) 
 		{
 			$res = $this->PostModel->all_posts($this->session->user_id);
@@ -47,13 +23,13 @@ class Board extends CI_Controller
 			$data['resi'] = $res;
 			$this->session->set_userdata('board_id', -1);
 			$data['uname'] = $this->session->username;
-			$data = $this->prepare_data($data);
+			$data = $this->BoardModel->prepare_data($data);
 			
 			$this->load->view('board/posts_all',$data);
 				
 		} else 
 		{
-				redirect("auth/login","refresh");
+			redirect("auth/login","refresh");
 		}
 	}
 		
@@ -61,7 +37,7 @@ class Board extends CI_Controller
 	{ //посты на доске 
 		$this->session->set_userdata('board_id', $user_id);
 		$data['uname'] = $user_name;
-		$data = $this->prepare_data($data);
+		$data = $this->BoardModel->prepare_data($data);
 					
 		
 		$res = $this->PostModel->get_board($user_id); 
@@ -95,7 +71,7 @@ class Board extends CI_Controller
 			
 			$data['resi'] = $res;
 			$data['uname'] = $user_name;
-			$data = $this->prepare_data($data);
+			$data = $this->BoardModel->prepare_data($data);
 			
 			$this->load->view('board/posts',$data);
 			
@@ -110,14 +86,10 @@ class Board extends CI_Controller
 		$this->session->set_userdata('board_id', -1);	
 		$res = $this->PostModel->get_all_boards();
 		$data['resi'] = $res->result(); 
-		$data = $this->prepare_data($data);
+		$data = $this->BoardModel->prepare_data($data);
 		$this->load->view('board/boards',$data);
 		
 	}
-		
-		/*public function main() {
-			redirect("board/view_board","refresh");
-		}*/
 		
 	public function comment($post_id) 
 	{ //добавить пост на страницу
@@ -136,9 +108,9 @@ class Board extends CI_Controller
 					'board_id' => $this->session->board_id,
 					'user_id' => $this->session->user_id,
 					'comment_id' => $post_id,
-					'title' => $_POST['title'],
-					'theme' => $_POST['theme'],
-					'text' => $_POST['text'],
+					'title' => $this->input->post('title'),
+					'theme' => $this->input->post('theme'),
+					'text' => $this->input->post('text'),
 					'deleted' => -1,
 					);
 							
@@ -146,7 +118,7 @@ class Board extends CI_Controller
 			}
 				//форма заполнена не полностью ... ну форм валидатор справиться сам
 		}
-		//до момента нажатия кнопки коммент
+		
 		$this->load->view('board/comment',array('title' => $this->session->username));
 	}
 		
@@ -180,9 +152,9 @@ class Board extends CI_Controller
 					'board_id' => $data['board_id'],
 					'user_id' => $this->session->user_id,
 					'comment_id' => $post_id,
-					'title' => $_POST['title'],
+					'title' => $this->input->post('title'),
 					'theme' => 'Answer '.$post_id.' '.$com_post->title.' to '.$data['answer'],
-					'text' => $_POST['text'],
+					'text' => $this->input->post('text'),
 					'deleted' => -1,
 				);
 				
@@ -201,15 +173,14 @@ class Board extends CI_Controller
 			$this->PostModel->delete_post($post_id);
 			$this->view($this->session->user_id,$this->session->username);
 		}
-	
 	}
 
 	public function post_other() 
 	{ //return JSON
-		$this->session->set_userdata('offset', ($this->session->has_userdata('offset') ? $this->session->offset + (isset($_POST['limit']) ? $_POST['limit'] : 0 ) : 5 ));
+		$this->session->set_userdata('offset', ($this->session->has_userdata('offset') ? $this->session->offset + ($this->input->post('limit') ? $this->input->post('limit') : 0 ) : 5 ));
 	
-		$limit = (isset($_POST['limit']) ? $_POST['limit'] : 0 );
-		$id_board = (isset($_POST['board_id']) ? $_POST['board_id'] : 1);
+		$limit = ($this->input->post('limit') ? $this->input->post('limit') : 0 );
+		$id_board = ($this->input->post('board_id') ? $this->input->post('board_id') : 1);
 	
 		$res = $this->PostModel->get_board_other($id_board, $limit, $this->session->offset);
 		$res = $res->result();
@@ -229,9 +200,9 @@ class Board extends CI_Controller
 	public function post_other_html() 
 	{ //html
 	
-		$this->session->set_userdata('offset', ($this->session->has_userdata('offset') ? $this->session->offset + (isset($_POST['limit']) ? $_POST['limit'] : 0 ) : 5 ));
-		$limit = (isset($_POST['limit']) ? $_POST['limit'] : 0 );
-		$id_board = ($this->session->has_userdata('board_id') ? $this->session->board_id : $_POST['board_id']);
+		$this->session->set_userdata('offset', ($this->session->has_userdata('offset') ? $this->session->offset + ($this->input->post('limit') ? $this->input->post('limit') : 0 ) : 5 ));
+		$limit = ($this->input->post('limit') ? $this->input->post('limit') : 0 );
+		$id_board = ($this->session->has_userdata('board_id') ? $this->session->board_id : $this->input->post('board_id'));
 		
 		$res = $this->PostModel->get_board_other($id_board, $limit,  $this->session->offset);
 		$res = $res->result();
@@ -241,13 +212,30 @@ class Board extends CI_Controller
 			$row = (array) $row;
 		endforeach;
 		$data['resi'] = $res;
-		$data = $this->prepare_data($data);
-				
+		$data = $this->BoardModel->prepare_data($data);
 		$this->load->view('board/post_other',$data);
 	}
 	
 }
 /*MVC
+	1)+ https://prnt.sc/pcqb67
+	2)+ https://prnt.sc/pcqbbw каст не используют обычно
+	3)+ https://prnt.sc/pcqbgr
+	4)+ https://prnt.sc/pcqblh нельзя работать с текстами в модели, тока во вью или контроллере если это аякс
+	5)+ https://prnt.sc/pcqbyr лишнаяя переменная
+		6)+ https://prnt.sc/pcqccp первй раз вижу такую функцию
+	7)+ https://prnt.sc/pcqcg3 форматирование
+	8)+ https://prnt.sc/pcqcs8 дублирование кода
+	9)+ https://prnt.sc/pcqcy7 текст
+	10)+ https://prnt.sc/pcqd53
+	11)+ https://prnt.sc/pcqdcy что за дичь?
+	12)+ https://prnt.sc/pcqdpn странные функции в контроллерах, может это модель или хелпер? Контроллеры грузят вьюхи
+	13)+ https://prnt.sc/pcqdzk опять комменты
+	14)+ https://prnt.sc/pcqe91 недопускается использование стандартных POST
+	15)+ https://prnt.sc/pcqek6 что это? - debug
+	16)+ https://prnt.sc/pcqeok что за куски кода?
+	17)+ https://prnt.sc/pcqfjs хедер напрямую в темплейте
+	
 	1)+ Использовать встренный механизм сессий, а не $_SESSION
 2)+ Форматирование не соотвествует стандартам движка, например https://prnt.sc/pbngzu
 	3)+ Не использовать шаблонизацию внутри контроллеров, для этого есть вьюхи https://prnt.sc/pbnh5x
@@ -306,4 +294,3 @@ https://prnt.sc/pbnlce
 На данной странице будут отображаться все комментарии вида : 
 заголовок сообщения, само сообщение. 
 */
-?>

@@ -22,4 +22,4 @@
 		</form>
 
 		</div>
-   <?php $this->load->view('templates/footer_board');	//,$data?>
+   <?php $this->load->view('templates/footer_board');	?>

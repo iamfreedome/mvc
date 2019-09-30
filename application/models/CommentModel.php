@@ -7,10 +7,15 @@ class CommentModel extends CI_Model
 		$this->load->database();
 	}
 	
+	public function getDbName()
+	{
+		return 'posts';
+	}
+	
 	public function get_all_comment() 
 	{
-		$this->db->select('*'); //'`text`,`post_id`,`deleted`'
-		$this->db->from('posts');
+		$this->db->select('*'); 
+		$this->db->from($this->getDbName());
 		$ret = $this->db->get();
 			
 		return $ret;
@@ -29,7 +34,7 @@ class CommentModel extends CI_Model
 				{ 
 					if ($arrow->deleted > 0) 
 					{ 
-						return ('Сообщение было удалено ранее');
+						return ('@deleted_flag');
 					} else 
 					{
 						return ($arrow->text);
@@ -37,9 +42,7 @@ class CommentModel extends CI_Model
 				}
 			}	
 	
-		} else 
-		{ return '';
-		}
+		} 
 	}	
 
 	public function add_comment(array $ar) 
@@ -48,13 +51,12 @@ class CommentModel extends CI_Model
 		{
 			$rowsa->comment = $this->get_comment($rowsa->comment_id);
 		}
-		return (array) $ar;
+		return $ar;
 	}
 
-public function set_comment($data) 
+	public function set_comment($data) 
 	{
-		$table = 'posts';
-		$this->db->insert($table,$data);
+		$this->db->insert($this->getDbName(),$data);
 	}
 
 }

@@ -23,7 +23,7 @@ class Auth extends CI_Controller
 		if ($this->form_validation->run() == TRUE) 
 		{	
 			//проверить пользователя в базе
-		$query = $this->AuthModel->get_user($_POST['username'],md5($_POST['password']));
+		$query = $this->AuthModel->get_user($this->input->post('username'),md5($this->input->post('password')));
 		$user = $query->row();
 			//если пользователь есть. if user exist.
 			
@@ -37,8 +37,7 @@ class Auth extends CI_Controller
 				'user_id' => $user->user_id,
 			);
 			$this->session->set_userdata($insess);	
-			//переадрессация/redirect
-			
+						
 			redirect("board/view_board","refresh");	
 						
 			} else 
@@ -66,9 +65,9 @@ class Auth extends CI_Controller
 			{
 				//echo 'Форма корректна';
 				$data = array(
-					'username' => $_POST['username'],
-					'email' => $_POST['email'],
-					'password' => md5($_POST['password']),
+					'username' => $this->input->post('username'),
+					'email' => $this->input->post('email'),
+					'password' => md5($this->input->post('password')),
 					);
 					
 				// add user in database
