@@ -18,7 +18,10 @@ class kniga_model extends CI_Model
 	{	
 		$list = file($this->getShkafName().'/.list');
 		for ($i = 0; $i< count($list); $i++) {
-			if (trim($list[$i]," \t\n\r\0")=='') {unset($list[$i]);} 
+			if (trim($list[$i]," \t\n\r\0")=='') 
+			{
+				unset($list[$i]);
+			} 
 		}
 		return $list;
 	}
