@@ -1,8 +1,6 @@
 <?php
-//методы: положить книгу в шкаф, достать и прочитать книгу из шкафа, дописать в книгу. книга текстовый файл
 class kniga_model extends CI_Model
 {
-//книга - текстовый файл
 
 	public function getShkafName()
 	{
@@ -89,12 +87,10 @@ class kniga_model extends CI_Model
 
 	public function append_book($shkaf_name,$book_name)
 	{
-
 		$path = ($this->getShkafName())."/$book_name";
 		$text = $this->input->post('text');
 
 		$this->writeBook($path,$text,'a');
-
 	}
 
 	public function open_book($shkaf_name,$book_name)

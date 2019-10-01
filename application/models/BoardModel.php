@@ -13,7 +13,7 @@ class BoardModel extends CI_Model
 			'username' => ($this->session->has_userdata('user_logged') ? $this->session->username : ''),
 			'user_id' => ($this->session->has_userdata('user_logged') ? $this->session->user_id : FALSE),
 			'board_id' => $this->session->userdata('board_id'),
-		);
+			);
 		return $ai;
 	}
 	
@@ -21,7 +21,7 @@ class BoardModel extends CI_Model
 	{
 		$pi = array ('base' => base_url().'index.php/board/answer/', 
 			'base_del' => base_url().'index.php/board/delete_post/',
-		);
+			);
 		return $pi;
 	}
 	
@@ -31,6 +31,5 @@ class BoardModel extends CI_Model
 		$data['pi']= $this->path_inf();
 		return $data;
 	}
-
 }	
 	

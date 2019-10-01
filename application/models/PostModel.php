@@ -12,7 +12,7 @@ class PostModel extends CI_Model
 			'theme' => '@deleted',
 			'text' => '@deleted',
 			'deleted' => 1,
-		);
+			);
 		return $deleted;
 	}
 	
@@ -40,7 +40,6 @@ class PostModel extends CI_Model
 		$this->db->where('deleted <', 1);
 		$this->db->limit($limit,$offset);
 		$this->db->order_by('post_id', 'ASC');
-		
 		$query = $this->db->get();
 		
 		return $query;
@@ -74,7 +73,7 @@ class PostModel extends CI_Model
 		$this->db->order_by('post_id', 'ASC');
 		
 		$query = $this->db->get();
-		return $query;//
+		return $query;
 	}
 	
 	public function add_post($data) 
@@ -88,7 +87,7 @@ class PostModel extends CI_Model
 		$this->db->from($this->getTableName());
 		$this->db->where(array('post_id' => $post_id));
 		$query = $this->db->get();
-		return $query;//
+		return $query;
 	}
 
 	public function get_post_withusername($post_id) 
@@ -96,9 +95,8 @@ class PostModel extends CI_Model
 		$this->db->select('*');
 		$this->db->from("`posts`,`users`");
 		$this->db->where("`posts`.`user_id`=`users`.`user_id` AND `posts`.`post_id`=$post_id");
-		
 		$query = $this->db->get();
-		return $query; //
+		return $query;
 	}
 
 	public function delete_post($post_id) 

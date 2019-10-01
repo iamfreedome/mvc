@@ -34,11 +34,10 @@ class Board extends CI_Controller
 	}
 		
 	public function view($user_id,$user_name) 
-	{ //посты на доске 
+	{
 		$this->session->set_userdata('board_id', $user_id);
 		$data['uname'] = $user_name;
 		$data = $this->BoardModel->prepare_data($data);
-					
 		
 		$res = $this->PostModel->get_board($user_id); 
 		$res = $res->result();
@@ -61,7 +60,6 @@ class Board extends CI_Controller
 		{
 			$user_id = $this->session->user_id;
 			$user_name = $this->session->username;
-			
 		
 			$this->session->set_userdata('board_id', $user_id);
 		
@@ -74,7 +72,6 @@ class Board extends CI_Controller
 			$data = $this->BoardModel->prepare_data($data);
 			
 			$this->load->view('board/posts',$data);
-			
 		} else 
 		{ 
 			redirect("board/view_board","refresh");
@@ -82,19 +79,18 @@ class Board extends CI_Controller
 	}
 		
 	public function view_board()
-	{ //доски всеъх пользователей
+	{
 		$this->session->set_userdata('board_id', -1);	
 		$res = $this->PostModel->get_all_boards();
 		$data['resi'] = $res->result(); 
 		$data = $this->BoardModel->prepare_data($data);
 		$this->load->view('board/boards',$data);
-		
 	}
 		
 	public function comment($post_id) 
-	{ //добавить пост на страницу
-		if (isset($_POST['comment'])) 
-		{ //Сделать обязательными все поля.
+	{
+		if ($this->input->post('text')) 
+		{
 			$this->form_validation->set_rules('title','Заголовок','required' );
 			$this->form_validation->set_rules('theme','Email','required' );
 			$this->form_validation->set_rules('text','ТЕКСТ','required' );
@@ -102,7 +98,6 @@ class Board extends CI_Controller
 				
 			if ($this->form_validation->run() == TRUE) 
 			{
-			//форма комментария корректна. известить комментарий в базу
 				$transfer = TRUE;
 				$data = array (
 					'board_id' => $this->session->board_id,
@@ -116,9 +111,7 @@ class Board extends CI_Controller
 							
 				$this->PostModel->add_post($data);
 			}
-				//форма заполнена не полностью ... ну форм валидатор справиться сам
 		}
-		
 		$this->load->view('board/comment',array('title' => $this->session->username));
 	}
 		
@@ -137,16 +130,16 @@ class Board extends CI_Controller
 		$data['text']= $com_post->text;
 		$data['board_id'] = $com_post->board_id;
 		$data['answer'] = $com_post->username;
-	
-		if (isset($_POST['comment'])) 
-		{ //Сделать обязательными все поля.
+
+		
+		if ($this->input->post('text')) 
+		{
 			$this->form_validation->set_rules('title','Заголовок','required' );
 			$this->form_validation->set_rules('text','ТЕКСТ','required' );
 			$transfer = FALSE;
 				
 			if ($this->form_validation->run() == TRUE) 
 			{
-			//форма комментария корректна. известить. комментарий в базу
 				$transfer = TRUE;
 				$data_insert = array (
 					'board_id' => $data['board_id'],
@@ -156,18 +149,16 @@ class Board extends CI_Controller
 					'theme' => 'Answer '.$post_id.' '.$com_post->title.' to '.$data['answer'],
 					'text' => $this->input->post('text'),
 					'deleted' => -1,
-				);
-				
+					);
 				$this->CommentModel->set_comment($data_insert);
 				redirect("board/view_board","refresh");
 			}
-				//форма заполнена не полностью ... ну форм валидатор справиться сам
 		}
 		$this->load->view('board/answer',$data);
 	}
 	
 	public function delete_post($post_id) 
-	{  	//проверка нужна или нет. по умолчанию проверять не будем. пусть даже удалят
+	{  	
 		if ($this->session->has_userdata('user_id')) 
 		{
 			$this->PostModel->delete_post($post_id);
@@ -176,7 +167,7 @@ class Board extends CI_Controller
 	}
 
 	public function post_other() 
-	{ //return JSON
+	{
 		$this->session->set_userdata('offset', ($this->session->has_userdata('offset') ? $this->session->offset + ($this->input->post('limit') ? $this->input->post('limit') : 0 ) : 5 ));
 	
 		$limit = ($this->input->post('limit') ? $this->input->post('limit') : 0 );
@@ -192,14 +183,12 @@ class Board extends CI_Controller
 		
 		header('Content-type: application/json; charset=utf-8');
 		$json = json_encode($res, JSON_UNESCAPED_UNICODE);
-		//коверкать илди нет кирилицу $json = json_encode($res);
 	
 		echo ($json);
 	}
 
 	public function post_other_html() 
-	{ //html
-	
+	{
 		$this->session->set_userdata('offset', ($this->session->has_userdata('offset') ? $this->session->offset + ($this->input->post('limit') ? $this->input->post('limit') : 0 ) : 5 ));
 		$limit = ($this->input->post('limit') ? $this->input->post('limit') : 0 );
 		$id_board = ($this->session->has_userdata('board_id') ? $this->session->board_id : $this->input->post('board_id'));

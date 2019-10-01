@@ -1,4 +1,4 @@
-<?php //controller/shkaf.php
+<?php 
 class Shkaf extends CI_Controller
 {
 	public function __construct() 
@@ -12,7 +12,7 @@ class Shkaf extends CI_Controller
 		$data = $this->kniga_model->list_book(); 
 		$this->load->view('shkaf/listbook',$data);
 	}
-			
+
 	public function book_append($shkaf_name,$book_name)
 	{
 		$this->load->helper('form');
