@@ -9,9 +9,9 @@ class PostModel extends CI_Model
 	
 	public function getDeleted()
 	{	$deleted = array ( 'title' => '@deleted',
-		'theme' => '@deleted',
-		'text' => '@deleted',
-		'deleted' => 1,
+			'theme' => '@deleted',
+			'text' => '@deleted',
+			'deleted' => 1,
 		);
 		return $deleted;
 	}
