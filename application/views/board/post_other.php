@@ -8,8 +8,9 @@
 	<?php if ( $row->comment_id > 0) { echo '<div class="alert-info" align="right">"',($row->comment == '@deleted_flag' ? "Комментируемое сообщение было удалено!" : $row->comment),'"</div>';
 	} ?>
  
-	<p><strong>
-		<?php echo $row->text; ?> </strong><!-- ответить ссылка-->
+		<p>	<strong>
+		<?php echo $row->text; ?> 
+		</strong><!-- ответить ссылка-->
 		<br>
 		<a href="<?php echo $pi['base'].$row->post_id ?>">
 			<?php echo (($ai['user_logged']) ? ' Ответить ' : '') ?>
@@ -18,7 +19,7 @@
 		<a href="<?php echo $pi['base_del'].$row->post_id ?>"><!-- удалить ссылка-->
 			<?php $flag = ($ai['user_logged'])&&(($ai['user_id'] == $row->user_id) or ($ai['user_id'] == $row->board_id));	echo ($flag ? ' Удалить ' : '') ?>
 		</a>
-	</p>
+		</p>
  
 	</div>
 

@@ -9,9 +9,9 @@ $this->load->view('templates/header_shkaf',array ('title' => 'СОДЕРЖАНИ
 ?></h3>
 	
 		<p> 
-		<a href="book_open/<?php echo $nameBook['path'] ?>"> Достать и открыть книгу </a> </p>
+			<a href="book_open/<?php echo $nameBook['path'] ?>"> Достать и открыть книгу </a> </p>
 		<p> 
-		<a href="book_append/<?php echo $nameBook['path'] ?>"> Дописать в книгу </a> </p>
+			<a href="book_append/<?php echo $nameBook['path'] ?>"> Дописать в книгу </a> </p>
 		<p> 
 		
 

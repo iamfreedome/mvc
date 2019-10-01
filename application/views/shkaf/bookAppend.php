@@ -5,7 +5,7 @@
 
 <h3><?php echo urldecode($book_name); ?> </h3>
 <div>
-<?php echo $text; ?>
+	<?php echo $text; ?>
 </div>
 
 <?php echo form_open('shkaf/make_append/'.$path) ?>

@@ -1,5 +1,6 @@
 	
-	<div class="result" id="cartmessage" style="display: none">Дополнительные комментарии: <br></div><br>
+	<div class="result" id="cartmessage" style="display: none">Дополнительные комментарии: <br>
+	</div><br>
 	
 	<a href="#" class="row-md-10" id="btn" >ПОСМОТРЕТЬ ЕЩЕ КОММЕНТАРИИ </a>
 	
