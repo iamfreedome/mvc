@@ -11,24 +11,59 @@ class kniga_model extends CI_Model
 
 	public function getPath($shkaf_name,$book_name)
 	{
-		return ($shkaf_name == $this->getShkafName() ? $shkaf_name : $this->getShkafName()).'/'.$book_name;
+		return ($this->getShkafName()).'/'.$book_name.'.book';
+	}
+	
+	public function getListBook()
+	{	
+		$list = file($this->getShkafName().'/.list');
+		for ($i = 0; $i< count($list); $i++) {
+			if (trim($list[$i]," \t\n\r\0")=='') {unset($list[$i]);} 
+		}
+		return $list;
+	}
+	
+	public function countListBook()
+	{
+		return count($this->getListBook());
+	}
+	
+	public function getNameBook($i)
+	{
+		$a = $this->getListBook();
+		return $a[$i];
 	}
 
-	public function get_book_name($path)
+	public function ShkafDescription($description)
 	{
-		$pi = pathinfo($path);
-		$book_return['path'] = $path;
-		$book_return['shkaf_name'] = $pi['dirname'];;
-		$book_return['book_name'] = urldecode($pi['basename']);
+		$fileDes = $this->getListBook();
+		$fileDes[count($fileDes)] = "\r\n".$description; 
+		$fp = fopen ($this->getShkafName().'/.list', "w");
+		
+		foreach ($fileDes as $output)
+		{
+			fwrite($fp,$output);
+		}
+		fclose($fp);
+		
+	}
+
+	public function get_book_name($path,$i)
+	{
+		$book_return['path'] = ($this->getShkafName())."/$i";
+		$book_return['shkaf_name'] = $this->getShkafName();
+		$book_return['book_name'] = $path;
 		return $book_return;
 	}
 
 	public function list_book()
 	{
-		$shkaf = $this->getShkafName();
-		foreach (glob($shkaf.'/*') as $path)
+		$shkaf = $this->getListBook();
+		$i = 0;
+		foreach ($shkaf as $path)
 		{
-			$book_return['listbook'][] = $this->get_book_name($path);
+			$book_return['listbook'][] = $this->get_book_name($path,$i);
+			$i++;
 		}
 		return $book_return;
 	}
@@ -42,21 +77,17 @@ class kniga_model extends CI_Model
 
 	public function add_book($shkaf_name)
 	{ 	
-		$this->load->helper('url');
-		$book_name = url_title($this->input->post('title'),'dash',TRUE);
-
-		$book_name = urlencode($book_name);
-
-		$path = ($shkaf_name == $this->getShkafName() ? $shkaf_name : $this->getShkafName()).'/'.$book_name;
+		$path = $this->getShkafName().'/'.($this->countListBook()).'.book';
 		$text = $this->input->post('text');
 
 		$this->writeBook($path,$text,'w');
+		$this->ShkafDescription($this->input->post('title'));
 	}
 
 	public function append_book($shkaf_name,$book_name)
 	{
 
-		$path = ($shkaf_name == $this->getShkafName() ? $shkaf_name : $this->getShkafName()).'/'.$book_name;
+		$path = ($this->getShkafName())."/$book_name";
 		$text = $this->input->post('text');
 
 		$this->writeBook($path,$text,'a');
@@ -66,7 +97,7 @@ class kniga_model extends CI_Model
 	public function open_book($shkaf_name,$book_name)
 	{
 		$path = $this->getPath($shkaf_name,$book_name);
-
+		
 		if (file_exists(urldecode($path)))
 		{
 			$path = urldecode($path);

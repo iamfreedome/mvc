@@ -1,0 +1,14 @@
+ NTcsdfks;aldfjl;skjfq;lasdfasdf Текст дописан в 6тую книгу... //методы: положить книгу в шкаф, достать и прочитать книгу из шкафа, дописать в книгу. книга текстовый файл
+class kniga_model extends CI_Model
+{
+//книга - текстовый файл
+	public function getShkafName()
+	{
+		return 'shkaf';
+	}
+	public function getPath($shkaf_name,$book_name)
+	{
+		return ($shkaf_name == $this->getShkafName() ? $shkaf_name : $this->getShkafName()).'/'.$book_name;
+	}
+	public function get_book_name($path)
+ => keep-alive [HTTP_UPGRADE_INSECURE_REQUESTS] => 1 [HTTP_USER_AGENT] => Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 YaBrowser/19.9.2.228 Yowser/2.5 Safari/537.36 [HTTP_ACCEPT] => text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3 [HTTP_REFERER] => http://test.local/index.php/shkaf/index [HTTP_ACCEPT_ENCODING] => gzip, deflate [HTTP_ACCEPT_LANGUAGE] => ru,en;q=0.9 [HTTP_COOKIE] => ci_session=d11nnegpqph9n586n2qe7a2hoevl5epm [PATH] => c:\users\user\temp\ospanel\modules\php\PHP_7.1-x64\ext;c:\users\user\temp\ospanel\modules\php\PHP_7.1-x64\pear;c:\users\user\temp\ospanel\modules\php\P
